@@ -75,7 +75,7 @@ def create_path_to(node):
     if node.parent is None:
         return [node]
 
-    return create_path(node.parent) + [node]
+    return create_path_to(node.parent) + [node]
 
 def attach_and_eval(successor, parent):
     pass
