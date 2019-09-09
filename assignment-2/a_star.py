@@ -112,7 +112,7 @@ def a_star(start_state, heuristic_func, successors_gen, goal_predicate, hash_fun
     if not hash_func:
         hash_func = hash
     if not cost_func:
-        cost_func = lambda _*: 1
+        cost_func = lambda *_: 1
 
     # Memoization table, maps from state to corresponding node
     memo = {}
