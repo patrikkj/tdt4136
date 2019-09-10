@@ -41,30 +41,39 @@ class Node:
     # Constants for node status
     OPEN, CLOSED = 1, 0
 
+    def __init__(self, state=None, g=None, h=None, f=None, status=None, parent=None, successors=None):
+        self.state = state
+        self.g = g
+        self.h = h
+        self.f = f
+        self.status = status
+        self.parent = parent
+        self.successors = successors if successors else []
+
 
 def initialize_start_node(start_state, heuristic_func):
-    start = Node()
-    start.state = start_state
+    start = Node(
+        state=start_state,
+        status=None,
+        parent=None,
+        successors=[]
+    )
     start.g = 0
     start.h = heuristic_func(start_state)
     start.f = start.g + start.h
-    start.status = Node.OPEN
-    start.parent = None
-    start.successors = []
     return start
 
 def initialize_successor_node(parent, successor_state, heuristic_func, cost_func):
-    successor = Node()
-    successor.state = successor_state
+    successor = Node(
+        state=successor_state,
+        status=None,
+        parent=parent,
+        successors=[]
+    )
     successor.g = parent.g + cost_func(parent.state, successor_state)
     successor.h = heuristic_func(successor_state)
     successor.f = successor.g + successor.h
-    successor.status = None
-    successor.parent = parent
-    successor.successors = []
     return successor
-
-
 
 def successors_gen(coord):
     for dx, dy in ((1, 0), (0, 1), (-1, 0), (0, -1)):
@@ -77,11 +86,22 @@ def create_path_to(node):
 
     return create_path_to(node.parent) + [node]
 
-def attach_and_eval(successor, parent):
-    pass
+def attach_and_eval(successor, parent, heuristic_func, cost_func):
+    successor.parent = parent
+    successor.g = parent.g + cost_func(successor.state, parent.state)
+    successor.h = heuristic_func(successor.state)
+    successor.f = successor.g + successor.h
 
-def propagate_path_improvements(successor):
-    pass
+def propagate_path_improvements(parent, heuristic_func, cost_func):
+    for successor in parent.successors:
+        new_cost = parent.g + cost_func(parent, successor)
+        if new_cost < successor.g:
+            successor.parent = parent
+            successor.g = new_cost
+            successor.f = successor.g 
+
+
+
 
 def a_star(start_state, heuristic_func, successors_gen, goal_predicate, hash_func=None, cost_func=None):
     """
@@ -130,7 +150,6 @@ def a_star(start_state, heuristic_func, successors_gen, goal_predicate, hash_fun
     while open_:
         u = open_.extract_min()
         closed.add(u)
-        u.status = Node.CLOSED
 
         # Test to see if goal state is reached
         if goal_predicate(u.state):
@@ -138,11 +157,8 @@ def a_star(start_state, heuristic_func, successors_gen, goal_predicate, hash_fun
 
         # Process successor states of current node
         for v_state in successors_gen():
-            # Check if state has been previously encountered
-            if v_state in memo:
-                v = memo[v_state]
-            else:
-                v = initialize_successor_node(u, v_state, heuristic_func, cost_func)
+            # Check if state has been previously encountered, create new by default
+            v = memo.get(v_state, initialize_successor_node(u, v_state, heuristic_func, cost_func))
 
             # Add to parents' list of successors
             u.successors.append(v)
@@ -150,10 +166,9 @@ def a_star(start_state, heuristic_func, successors_gen, goal_predicate, hash_fun
             if v not in open_ and v not in closed:
                 attach_and_eval(v, u)
                 open_.insert(v)
-                v.status = Node.OPEN
             elif u.g + cost_func(u.state, v.state) < v.g:
-                attach_and_eval(v, u)
-                if v.status == Node.CLOSED:
+                attach_and_eval(v, u, heuristic_func, cost_func)
+                if v in closed:
                     propagate_path_improvements(v)
 
 
@@ -161,5 +176,9 @@ def task_1():
     map_obj = Map_Obj()
     map_obj.show_map()
     map_obj.print_map(map_obj.str_map)
+
+    q = MinHeap()
+    q.insert(2)
+    print(q.extract_min())
 
 task_1()
