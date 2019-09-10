@@ -59,8 +59,8 @@ def main():
         heuristic_func = manhattan
 
         output = a_star(start_state, heuristic_func, successors_gen, goal_predicate, cost_func=cost_func)
-        for node in output:
-            map_obj.set_cell_value(node.state[1:], "☺", str_map = True)
+        for coords in output:
+            map_obj.set_cell_value(coords, "☺", str_map = True)
 
         map_obj.show_map()
         input()

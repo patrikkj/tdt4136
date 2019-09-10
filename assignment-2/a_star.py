@@ -103,7 +103,7 @@ def a_star(start_state, heuristic_func, successors_gen, goal_predicate, cost_fun
         # Test to see if goal state is reached
         if goal_predicate(u.state):
             print("Goal found!")
-            return create_path_to(u)       
+            return [node.state[1:] for node in create_path_to(u)]       
 
         # Process successor states of current node
         for v_state in successors_gen(u.state):
