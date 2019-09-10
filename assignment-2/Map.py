@@ -5,16 +5,21 @@ import time
 from PIL import Image
 
 class Map_Obj():
+    # Map format
+    START_CELL = 'S'
+    GOAL_CELL = 'G'
+    OBSTACLE_CELL = -1
+    REGULAR_CELLS = (1, 2, 3, 4)
+
     def __init__(self, task=1):
         self.start_pos, self.goal_pos, self.end_goal_pos, self.path_to_map = self.fill_critical_positions(task)
-        # self.int_map, self.str_map = self.read_map(self.path_to_map, self.start_pos, self.goal_pos)
         self.int_map, self.str_map = self.read_map(self.path_to_map)
         self.tmp_cell_value = self.get_cell_value(self.goal_pos)
         self.set_cell_value(self.start_pos, 'S')
         self.set_cell_value(self.goal_pos, 'G')
         self.tick_counter = 0
-        #self.set_start_pos_str_marker(start_pos, self.str_map)
-        #self.set_goal_pos_str_marker(goal_pos, self.str_map)
+        self.set_start_pos_str_marker(self.start_pos, self.str_map)
+        self.set_goal_pos_str_marker(self.goal_pos, self.str_map)
 
     def read_map(self, path):
         """
@@ -104,6 +109,8 @@ class Map_Obj():
 
     def set_cell_value(self, pos, value, str_map = True):
         if str_map:
+            if self.str_map[pos[0], pos[1]] in ('S', 'G'): # don't overwrite start/end
+                return
             self.str_map[pos[0], pos[1]] = value
         else:
             self.int_map[pos[0], pos[1]] = value
@@ -227,6 +234,11 @@ class Map_Obj():
                 for i in range(scale):
                     for j in range(scale):
                         pixels[x * scale + i, y * scale + j] = colors[map[y][x]]
+        
+        # Saves solution to file
+        image.save("solution.png","PNG")
+
         # Show image
         image.show()
+
 
