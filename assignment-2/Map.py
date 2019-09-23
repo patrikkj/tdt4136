@@ -235,8 +235,8 @@ class Map_Obj():
                     for j in range(scale):
                         pixels[x * scale + i, y * scale + j] = colors[map[y][x]]
         
-        # Saves solution to file
-        image.save("solution.png","PNG")
+        # # Saves solution to file
+        # image.save("solution.png","PNG")
 
         # Show image
         image.show()
