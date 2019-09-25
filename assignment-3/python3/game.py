@@ -295,7 +295,35 @@ class Actions:
                    Directions.WEST:  (-1, 0),
                    Directions.STOP:  (0, 0)}
 
-    _directionsAsList = list(_directions.items())
+    # --- In Python 2.7 (Previous implementation) ---
+    # _directionsAsList = list(_directions.items())
+    # >>> [('West', (-1, 0)), ('Stop', (0, 0)), ('East', (1, 0)), ('North', (0, 1)), ('South', (0, -1))]
+    # 
+    # --- In Python 3 ---
+    # _directionsAsList = list(_directions.items())
+    # >>> [('North', (0, 1)), ('South', (0, -1)), ('East', (1, 0)), ('West', (-1, 0)), ('Stop', (0, 0))]
+    # 
+    # The given statement creates a list from an unordered data structure (not recommended).
+    # Therefore, the statement was interpreted differently in Python 2 and 3,
+    # resulting in two different orders.
+    #
+    # Since tests rely on states being examined in the right order, this caused
+    # tests to fail even though the implementation examined nodes correctly, based
+    # on the order nodes were supplied by GameState.getLegalMoves(...)
+    #
+    # See https://docs.python.org/2.7/library/stdtypes.html#dict.items for an explanation
+    # of order of elements in a Python 2 dictionary.
+    #
+    # In order to fix this issue, we manually specify the order of elements
+    # reflecting the order given by the Python 2 statement.
+    
+    _directionsAsList = [
+        (Directions.WEST, (-1, 0)), 
+        (Directions.STOP, (0, 0)), 
+        (Directions.EAST, (1, 0)), 
+        (Directions.NORTH, (0, 1)), 
+        (Directions.SOUTH, (0, -1))
+    ]
 
     TOLERANCE = .001
 
