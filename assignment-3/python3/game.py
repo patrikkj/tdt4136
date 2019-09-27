@@ -607,7 +607,7 @@ class Game:
                 self.mute(i)
                 # this is a null agent, meaning it failed to load
                 # the other team wins
-                print(f"Agent {i} failed to load")
+                print("Agent %d failed to load" % i, file=sys.stderr)
                 self.unmute()
                 self._agentCrash(i, quiet=True)
                 return
