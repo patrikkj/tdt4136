@@ -158,12 +158,28 @@ class MinimaxAgent(MultiAgentSearchAgent):
     """
 
     @staticmethod
-    def minimax_multiagent(node, successor_gen, utility_func, depth, num_adversaries=1):
+    def minimax_multiagent(node, successor_gen, utility_func, terminal_func, depth, num_adversaries=1):
         """
-        DOCS
+        Implementation of Minimax, supporting an arbitary number of adversaries.
+
+        Input:
+            node:               Node encapsulating the state to be evaluated.
+            successor_gen:      Generator which yields all successor states with corresponding 
+                                action for the agent specified.
+                                    (state, agent_index) -> yield (successor_state, action)
+            utility_func:       State evaluation function.
+                                    state -> utility
+            terminal_func:      Function that determines whether the given state is a terminal state.
+                                    state -> True or False
+            depth:              Depth of search tree.
+            num_adversaries:    Number of adversaries
+
+        Returns:
+            A MinimaxNode which represents the optimal successor node.
+            Optimal action is given by the 'action' attribute of the returned node.
         """
         # Base case
-        if depth == 0 or node.state.isWin() or node.state.isLose():
+        if depth == 0 or terminal_func(node.state):
             node.utility = utility_func(node.state)
             return node
 
@@ -181,7 +197,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
             node.successors.append(v)
             
             # Evaluate successor
-            MinimaxAgent.minimax_multiagent(v, successor_gen, utility_func, next_depth, num_adversaries)
+            MinimaxAgent.minimax_multiagent(v, successor_gen, utility_func, terminal_func, next_depth, num_adversaries)
 
         # Find best successor, inherit utility from the selected node
         best_successor = _min_or_max(node.successors, key=lambda successor: successor.utility)
@@ -193,6 +209,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
     def successor_gen(state, agent_index):
         actions = state.getLegalActions(agent_index)
         yield from ((state.generateSuccessor(agent_index, action), action) for action in actions)
+        # yield from map(lambda action: (state.generateSuccessor(agent_index, action), action), actions)
+        # yield from zip(map(lambda action: state.generateSuccessor(agent_index, action), actions), actions)
 
     def getAction(self, gameState):
         """
@@ -216,6 +234,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
             node=current_node, 
             successor_gen=self.successor_gen, 
             utility_func=lambda state: state.getScore(), 
+            terminal_func=lambda state: state.isWin() or state.isLose(),
             depth=self.depth, 
             num_adversaries=gameState.getNumAgents() - 1 
         )
@@ -227,12 +246,31 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     """
 
     @staticmethod
-    def alphabeta_multiagent(node, successor_gen, utility_func, depth, num_adversaries=1):
+    def alphabeta_multiagent(node, successor_gen, utility_func, terminal_func, depth, num_adversaries=1):
         """
-        DOCS
+        Implementation of Minimax with alpha-beta pruning, 
+        supporting an arbitary number of adversaries.
+
+        Input:
+            node:               Node encapsulating the state to be evaluated.
+            successor_gen:      Generator which yields all successor states with corresponding 
+                                action for the agent specified.
+                                    (state, agent_index) -> yield (successor_state, action)
+            utility_func:       State evaluation function.
+                                    state -> utility
+            terminal_func:      Function that determines whether the given state is a terminal state.
+                                    state -> True or False
+            depth:              Depth of search tree.
+
+            (Optional)
+            num_adversaries:    Number of adversaries, defaults to 1.
+
+        Returns:
+            A MinimaxNode which represents the optimal successor node.
+            Optimal action is given by the 'action' attribute of the returned node.
         """
         # Base case
-        if depth == 0 or node.state.isWin() or node.state.isLose():
+        if depth == 0 or terminal_func(node.state):
             node.utility = utility_func(node.state)
             return node
 
@@ -250,7 +288,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             node.successors.append(v)
             
             # Evaluate successor
-            AlphaBetaAgent.alphabeta_multiagent(v, successor_gen, utility_func, next_depth, num_adversaries)
+            AlphaBetaAgent.alphabeta_multiagent(v, successor_gen, utility_func, terminal_func, next_depth, num_adversaries)
             
             # Check if current subtree can be pruned
             if _min_or_max == max:
