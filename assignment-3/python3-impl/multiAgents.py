@@ -317,6 +317,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             node=current_node,
             successor_gen=MinimaxAgent.successor_gen, 
             utility_func=lambda state: state.getScore(),
+            terminal_func=lambda state: state.isWin() or state.isLose(),
             depth=self.depth,
             num_adversaries=gameState.getNumAgents() -1 
         )
