@@ -35,14 +35,15 @@ class MinimaxNode:
         self.alpha = alpha
         self.beta = beta
 
+    @staticmethod
     def create_minimax_node(state, action, agent_index):
         return MinimaxNode(
             state=state,
             action=action,
             agent_index=agent_index
         )
-    create_minimax_node = staticmethod(create_minimax_node)    
 
+    @staticmethod
     def create_alphabeta_node(state, action, agent_index, alpha, beta):
         return MinimaxNode(
             state=state,
@@ -51,7 +52,6 @@ class MinimaxNode:
             alpha=alpha,
             beta=beta
         )
-    create_alphabeta_node = staticmethod(create_alphabeta_node)
 
 
 class ReflexAgent(Agent):
@@ -202,12 +202,12 @@ class MinimaxAgent(MultiAgentSearchAgent):
         node.utility = best_successor.utility
         return best_successor
 
+    @staticmethod
     def successor_gen(state, agent_index):
         actions = state.getLegalActions(agent_index)
         for action in actions:
             yield (state.generateSuccessor(agent_index, action), action)
             
-    successor_gen = staticmethod(successor_gen)
 
     def getAction(self, gameState):
         """
@@ -243,6 +243,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
       Your minimax agent with alpha-beta pruning (question 3)
     """
 
+    @staticmethod
     def alphabeta_multiagent(node, successor_gen, utility_func, terminal_func, depth, num_adversaries=1):
         """
         Implementation of Minimax with alpha-beta pruning, 
@@ -306,7 +307,6 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             node.successors, key=lambda successor: successor.utility)
         node.utility = best_successor.utility
         return best_successor
-    alphabeta_multiagent = staticmethod(alphabeta_multiagent)
 
     def getAction(self, gameState):
         """
