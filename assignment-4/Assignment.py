@@ -113,7 +113,10 @@ class CSP:
                 if result:
                     return result
         self._failures += 1
-        return {}         
+        return {}      
+
+    def backtrack_oneline_cancer(self, assignment, order=False):
+        return assignment if all(len(domain) == 1 for domain in assignment.values()) else (lambda u_var: next((elem for elem in ((lambda assignment_copy: self.backtrack_oneline_cancer(assignment_copy, order=order) if self.inference(assignment_copy, list((j, u_var) for j in self.constraints[u_var].keys())) else False)({k:(v if k != u_var else [value]) for k, v in copy.deepcopy(assignment).items()}) for value in (self.order_legal_values(assignment, u_var) if order else assignment[u_var])) if elem), {}))(self.select_unassigned_variable(assignment))
 
     def order_legal_values(self, assignment, variable):
         '''
@@ -226,16 +229,25 @@ def print_sudoku_solution(solution):
         output += "\n"
         if row == 2 or row == 5:
             output += '------+-------+------\n'
-    
     print(output)
 
 
+# Print results for regular implementation
 for filename in ("easy", "medium", "hard", "veryhard"):
     print(f"\n --- {filename.capitalize()} --- ")
     for order in (True, False):
         csp = create_sudoku_csp(f"{filename}.txt")
         solution = csp.backtracking_search(order=order)
-        print(f"\tORDER = {order}")
-        print(f"\tNumber of calls to backtrack: {csp._backtrack_calls}")
-        print(f"\tNumber of backtrack failures: {csp._failures}\n")
-    print_sudoku_solution(solution)
+        print(f"ORDER = {order}")
+        print(f"Number of calls to backtrack: {csp._backtrack_calls}")
+        print(f"Number of backtrack failures: {csp._failures}")
+        print_sudoku_solution(solution)
+
+# Print results for oneline implementation
+for filename in ("easy", "medium", "hard", "veryhard"):
+    print(f"\n --- {filename.capitalize()} (ONE LINE) --- ")
+    for order in (True, False):
+        csp = create_sudoku_csp(f"{filename}.txt")
+        solution = csp.backtracking_search(order=order)
+        print(f"ORDER = {order}")
+        print_sudoku_solution(solution) 
