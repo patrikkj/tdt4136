@@ -96,15 +96,7 @@ class CSPBase(ABC):
         pass
 
     @abstractmethod
-    def select_unassigned_variable(self, assignment):
-        pass
-
-    @abstractmethod
     def inference(self, assignment, queue):
-        pass
-    
-    @abstractmethod
-    def revise(self, assignment, i, j):
         pass
 
 
